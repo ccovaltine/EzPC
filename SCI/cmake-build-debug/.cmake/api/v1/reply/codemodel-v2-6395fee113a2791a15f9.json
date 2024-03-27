@@ -1,0 +1,322 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-df46cf77416a5d516254.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.3.2"
+					},
+					"projectIndex" : 0,
+					"source" : "."
+				},
+				{
+					"build" : "src",
+					"childIndexes" : 
+					[
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-src-Debug-ef2acd3f765790fe7cc0.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.3.2"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "src",
+					"targetIndexes" : 
+					[
+						0,
+						4,
+						8,
+						9
+					]
+				},
+				{
+					"build" : "src/utils",
+					"jsonFile" : "directory-src.utils-Debug-3e06762d87894fb62125.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.3.2"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "src/utils",
+					"targetIndexes" : 
+					[
+						10
+					]
+				},
+				{
+					"build" : "src/OT",
+					"jsonFile" : "directory-src.OT-Debug-9f05ac33df6c33f9ecc6.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.3.2"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "src/OT"
+				},
+				{
+					"build" : "src/GC",
+					"jsonFile" : "directory-src.GC-Debug-c55e35ed1236c238fb98.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.3.2"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "src/GC",
+					"targetIndexes" : 
+					[
+						3
+					]
+				},
+				{
+					"build" : "src/Millionaire",
+					"jsonFile" : "directory-src.Millionaire-Debug-413dbbc4dba7a20c448e.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.3.2"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "src/Millionaire"
+				},
+				{
+					"build" : "src/BuildingBlocks",
+					"jsonFile" : "directory-src.BuildingBlocks-Debug-e2940f5777f28f03dbe6.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.3.2"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "src/BuildingBlocks",
+					"targetIndexes" : 
+					[
+						1
+					]
+				},
+				{
+					"build" : "src/LinearOT",
+					"jsonFile" : "directory-src.LinearOT-Debug-f146159fc2a511556bdd.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.3.2"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "src/LinearOT",
+					"targetIndexes" : 
+					[
+						6
+					]
+				},
+				{
+					"build" : "src/LinearHE",
+					"jsonFile" : "directory-src.LinearHE-Debug-e88f935bf837730e20dd.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.3.2"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "src/LinearHE",
+					"targetIndexes" : 
+					[
+						5
+					]
+				},
+				{
+					"build" : "src/NonLinear",
+					"jsonFile" : "directory-src.NonLinear-Debug-bb3cfbde84c212be8af6.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.3.2"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "src/NonLinear"
+				},
+				{
+					"build" : "src/Math",
+					"jsonFile" : "directory-src.Math-Debug-f5312afe4fb05464253f.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.3.2"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "src/Math",
+					"targetIndexes" : 
+					[
+						7
+					]
+				},
+				{
+					"build" : "src/FloatingPoint",
+					"jsonFile" : "directory-src.FloatingPoint-Debug-530ae9bea4465921b360.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.3.2"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "src/FloatingPoint",
+					"targetIndexes" : 
+					[
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11
+					],
+					"name" : "SCI",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 1,
+					"id" : "SCI-Beacon::@145eef247bfb46b6828c",
+					"jsonFile" : "target-SCI-Beacon-Debug-371ec9524eb878265c2b.json",
+					"name" : "SCI-Beacon",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 6,
+					"id" : "SCI-BuildingBlocks::@6460baba2abf03b62da4",
+					"jsonFile" : "target-SCI-BuildingBlocks-Debug-d6507b3999e198356e18.json",
+					"name" : "SCI-BuildingBlocks",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 11,
+					"id" : "SCI-FloatingPoint::@aea596f6fedf761a6b10",
+					"jsonFile" : "target-SCI-FloatingPoint-Debug-6f31ebc3e93f2b849a5f.json",
+					"name" : "SCI-FloatingPoint",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "SCI-GC::@9ae40091a0c19716761f",
+					"jsonFile" : "target-SCI-GC-Debug-636470318f4bdfa3377b.json",
+					"name" : "SCI-GC",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "SCI-HE::@145eef247bfb46b6828c",
+					"jsonFile" : "target-SCI-HE-Debug-65caaa08b4f0e42a21ee.json",
+					"name" : "SCI-HE",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 8,
+					"id" : "SCI-LinearHE::@8203ade333def11cfab2",
+					"jsonFile" : "target-SCI-LinearHE-Debug-84d70de048a2f6b6253a.json",
+					"name" : "SCI-LinearHE",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 7,
+					"id" : "SCI-LinearOT::@027758fc7ca214253629",
+					"jsonFile" : "target-SCI-LinearOT-Debug-de0b70cea8af9e771236.json",
+					"name" : "SCI-LinearOT",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 10,
+					"id" : "SCI-Math::@d4001bcfecec97d2933a",
+					"jsonFile" : "target-SCI-Math-Debug-039b43e405f6bb12af2f.json",
+					"name" : "SCI-Math",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "SCI-OT::@145eef247bfb46b6828c",
+					"jsonFile" : "target-SCI-OT-Debug-c1441e49b3bb3de11639.json",
+					"name" : "SCI-OT",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "SCI-SecfloatML::@145eef247bfb46b6828c",
+					"jsonFile" : "target-SCI-SecfloatML-Debug-e43461d8828965fe8b1c.json",
+					"name" : "SCI-SecfloatML",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "SCI-utils::@f1b38b22aeb65474a6c5",
+					"jsonFile" : "target-SCI-utils-Debug-30d30c26957ecb7b6aa3.json",
+					"name" : "SCI-utils",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/lyc/Desktop/EzPC/SCI/cmake-build-debug",
+		"source" : "/home/lyc/Desktop/EzPC/SCI"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}

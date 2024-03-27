@@ -1,0 +1,301 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"install"
+		],
+		"files" : 
+		[
+			"src/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 62,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 84,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 89,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 105,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 119,
+				"parent" : 0
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"lib/libSCI-OT.a"
+			],
+			"targetId" : "SCI-OT::@145eef247bfb46b6828c",
+			"targetIndex" : 8,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"lib/libSCI-HE.a"
+			],
+			"targetId" : "SCI-HE::@145eef247bfb46b6828c",
+			"targetIndex" : 4,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"lib/libSCI-FloatingPoint.a"
+			],
+			"targetId" : "SCI-FloatingPoint::@aea596f6fedf761a6b10",
+			"targetIndex" : 2,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"lib/libSCI-SecfloatML.a"
+			],
+			"targetId" : "SCI-SecfloatML::@145eef247bfb46b6828c",
+			"targetIndex" : 9,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"lib/libSCI-Beacon.a"
+			],
+			"targetId" : "SCI-Beacon::@145eef247bfb46b6828c",
+			"targetIndex" : 0,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"lib/libSCI-BuildingBlocks.a"
+			],
+			"targetId" : "SCI-BuildingBlocks::@6460baba2abf03b62da4",
+			"targetIndex" : 1,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"lib/libSCI-LinearOT.a"
+			],
+			"targetId" : "SCI-LinearOT::@027758fc7ca214253629",
+			"targetIndex" : 6,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"lib/libSCI-LinearHE.a"
+			],
+			"targetId" : "SCI-LinearHE::@8203ade333def11cfab2",
+			"targetIndex" : 5,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"lib/libSCI-Math.a"
+			],
+			"targetId" : "SCI-Math::@d4001bcfecec97d2933a",
+			"targetIndex" : 7,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"lib/libSCI-GC.a"
+			],
+			"targetId" : "SCI-GC::@9ae40091a0c19716761f",
+			"targetIndex" : 3,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 2,
+			"component" : "Unspecified",
+			"destination" : "lib/cmake/SCI",
+			"exportName" : "SCITargets",
+			"exportTargets" : 
+			[
+				{
+					"id" : "SCI-OT::@145eef247bfb46b6828c",
+					"index" : 8
+				},
+				{
+					"id" : "SCI-HE::@145eef247bfb46b6828c",
+					"index" : 4
+				},
+				{
+					"id" : "SCI-common::@145eef247bfb46b6828c",
+					"index" : 0
+				},
+				{
+					"id" : "SCI-FloatingPoint::@aea596f6fedf761a6b10",
+					"index" : 2
+				},
+				{
+					"id" : "SCI-SecfloatML::@145eef247bfb46b6828c",
+					"index" : 9
+				},
+				{
+					"id" : "SCI-Beacon::@145eef247bfb46b6828c",
+					"index" : 0
+				},
+				{
+					"id" : "SCI-BuildingBlocks::@6460baba2abf03b62da4",
+					"index" : 1
+				},
+				{
+					"id" : "SCI-LinearOT::@027758fc7ca214253629",
+					"index" : 6
+				},
+				{
+					"id" : "SCI-LinearHE::@8203ade333def11cfab2",
+					"index" : 5
+				},
+				{
+					"id" : "SCI-NonLinear::@bf9a83407d5efbe6030f",
+					"index" : 0
+				},
+				{
+					"id" : "SCI-Math::@d4001bcfecec97d2933a",
+					"index" : 7
+				},
+				{
+					"id" : "SCI-Millionaire::@eb42df96ed162f721e59",
+					"index" : 0
+				},
+				{
+					"id" : "SCI-GC::@9ae40091a0c19716761f",
+					"index" : 3
+				},
+				{
+					"id" : "SCI-OTPrimitive::@8f2bd1826b45330b4dec",
+					"index" : 0
+				},
+				{
+					"id" : "SCI-utils::@f1b38b22aeb65474a6c5",
+					"index" : 10
+				}
+			],
+			"paths" : 
+			[
+				"src/CMakeFiles/Export/b3c8551532b255d0ffe0d32ec77a0d27/SCITargets.cmake"
+			],
+			"type" : "export"
+		},
+		{
+			"backtrace" : 3,
+			"component" : "Unspecified",
+			"destination" : "include",
+			"paths" : 
+			[
+				"src/utils",
+				"src/OT",
+				"src/GC",
+				"src/Millionaire",
+				"src/NonLinear",
+				"src/BuildingBlocks",
+				"src/LinearOT",
+				"src/LinearHE",
+				"src/Math",
+				"src/FloatingPoint"
+			],
+			"type" : "directory"
+		},
+		{
+			"backtrace" : 4,
+			"component" : "Unspecified",
+			"destination" : "include",
+			"paths" : 
+			[
+				"src/defines.h",
+				"src/defines_uniform.h",
+				"src/defines_float.h",
+				"src/globals.h",
+				"src/globals_float.h",
+				"src/library_fixed.h",
+				"src/library_fixed_uniform.h",
+				"src/library_float.h",
+				"src/cleartext_library_fixed.h",
+				"src/cleartext_library_fixed_uniform.h",
+				"src/cleartext_library_float.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 5,
+			"component" : "Unspecified",
+			"destination" : "lib/cmake/SCI",
+			"paths" : 
+			[
+				"src/utils/cmake/FindGMP.cmake",
+				"src/utils/cmake/source_of_randomness.cmake"
+			],
+			"type" : "file"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "src",
+		"source" : "src"
+	}
+}
