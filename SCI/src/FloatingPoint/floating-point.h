@@ -201,7 +201,7 @@ public:
 
 std::ostream &operator<<(std::ostream &os, FPArray &other);
 
-FPArray concat(const vector<FPArray>& x);
+FPArray concat(const std::vector<FPArray>& x);
 
 class FPMatrix : public FPArray {
 public:
@@ -405,7 +405,7 @@ public:
   //// exp[i] = exp (with bitlength x.e_bits + 2)
   FPArray mulpow2(const FPArray &x, int exp, bool check_bounds = true);
 
-  vector<FPArray> mul(const vector<FPArray> &x, const vector<FPArray> &y) ;
+  std::vector<FPArray> mul(const std::vector<FPArray> &x, const std::vector<FPArray> &y) ;
 
   // Multiplication: returns x[i] * y[i]
   // check_bounds is an optional parameter which rounds to 0/inf in case of underflows/overflows after multiplication
@@ -431,7 +431,7 @@ public:
   FPArray sub(const FPArray &x, const FPArray &y, bool cheap_variant = false,
               bool compare_and_swap = true, bool check_bounds = true);
 
-  vector<FPArray> div(const vector<FPArray> &x, const FPArray &y, bool cheap_variant = false,
+  std::vector<FPArray> div(const std::vector<FPArray> &x, const FPArray &y, bool cheap_variant = false,
               bool check_bounds = true);
   // Division: returns x[i] / y[i]
   // If cheap_variant is set to true, division is cheaper in cost but does not return correctly rounded results
@@ -440,7 +440,7 @@ public:
   // x and y must be of the same size, and have the same mantissa (m_bits) and exponent bits (e_bits)
   FPArray div(const FPArray &x, const FPArray &y, bool cheap_variant = false,
       bool check_bounds = true) {
-    vector<FPArray> x_vec(1);
+    std::vector<FPArray> x_vec(1);
     x_vec[0] = x;
     return (fp_op->div(x_vec, y, cheap_variant, check_bounds))[0];
   }
@@ -466,17 +466,17 @@ public:
   // Finds max element m_i in x[i], forall i, along with a mask vector mask_i which is 1 at the index of the max element and 0 otherwise
   // Returns a FPArray of length x.size() with m_i in i-th index and a vector of BoolArrays `mask` of the same size as input.
   // mask[i][j] is 1 if j is the index of the max element in x[i] and 0 otherwise
-  std::pair<FPArray, vector<BoolArray>> max_with_mask(const std::vector<FPArray> &x) ;
+  std::pair<FPArray, std::vector<BoolArray>> max_with_mask(const std::vector<FPArray> &x) ;
 
-  FPArray general_vector_sum_core(const vector<FPArray> &x, int b_, int sc, int m_bits, int e_bits);
-  FPArray vector_sum_core(const vector<FPArray> &x) {
+  FPArray general_vector_sum_core(const std::vector<FPArray> &x, int b_, int sc, int m_bits, int e_bits);
+  FPArray vector_sum_core(const std::vector<FPArray> &x) {
     int m_bits = x[0].m_bits;
     int e_bits = x[0].e_bits;
     return general_vector_sum_core(x, m_bits, m_bits, m_bits, e_bits);
   }
 
-  FPArray general_vector_sum(vector<FPArray> &x, int b_, int sc, int m_bits, int e_bits);
-  FPArray vector_sum(vector<FPArray> &x) {
+  FPArray general_vector_sum(std::vector<FPArray> &x, int b_, int sc, int m_bits, int e_bits);
+  FPArray vector_sum(std::vector<FPArray> &x) {
     int m_bits = x[0].m_bits;
     int e_bits = x[0].e_bits;
     return general_vector_sum(x, m_bits, m_bits, m_bits, e_bits);
@@ -484,21 +484,24 @@ public:
 
   // Finds sum s_i of elements in x[i], forall i
   // Returns a FPArray of length x.size() with s_i in i-th index
-  FPArray treesum(const vector<FPArray> &x) ;
+  FPArray treesum(const std::vector<FPArray> &x) ;
 
-  FPArray dot_product(const vector<FPArray> &x, const vector<FPArray> &y);
+  FPArray dot_product(const std::vector<FPArray> &x, const std::vector<FPArray> &y);
 
   FPMatrix matrix_multiplication_beacon(const FPMatrix &x, const FPMatrix &y, int chunk_exp=26) ;
 
   FPMatrix matrix_multiplication_secfloat(const FPMatrix &x, const FPMatrix &y, int chunk_exp=15) ;
 
-  vector<FPMatrix> matrix_multiplication_beacon(const vector<FPMatrix> &x, const vector<FPMatrix> &y, int chunk_exp=26) ;
+  std::vector<FPMatrix> matrix_multiplication_beacon(const std::vector<FPMatrix> &x, const std::vector<FPMatrix> &y, int chunk_exp=26) ;
 
-  vector<FPMatrix> matrix_multiplication_secfloat(const vector<FPMatrix> &x, const vector<FPMatrix> &y, int chunk_exp=15) ;
+  std::vector<FPMatrix> matrix_multiplication_secfloat(const std::vector<FPMatrix> &x, const std::vector<FPMatrix> &y, int chunk_exp=15) ;
 
   FPArray bfloat16_to_FP32(const FPArray &x);
   
   FPArray FP32_to_bfloat16(const FPArray &x);
+
 };
+
+void test_div(FPOp* fp_op_, int party_, int sz_, float f_, uint8_t m_bits_, uint8_t e_bits_, bool verbose);
 
 #endif // FLOATING_POINT_H__

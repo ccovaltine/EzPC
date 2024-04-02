@@ -1213,3 +1213,36 @@ events:
       stderr: |
       exitCode: 0
 ...
+
+---
+events:
+  -
+    kind: "try_run-v1"
+    backtrace:
+      - "src/utils/cmake/source_of_randomness.cmake:8 (try_run)"
+      - "src/utils/CMakeLists.txt:2 (include)"
+    directories:
+      source: "/home/lyc/Desktop/EzPC/SCI/cmake-build-debug/CMakeFiles/CMakeTmp"
+      binary: "/home/lyc/Desktop/EzPC/SCI/cmake-build-debug/CMakeFiles/CMakeTmp"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "-mrdseed"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_MODULE_PATH: "/home/lyc/Desktop/EzPC/SCI/src/utils/cmake"
+    buildResult:
+      variable: "RDSEED_COMPILE_RESULT"
+      cached: true
+      stdout: |
+        Change Dir: '/home/lyc/Desktop/EzPC/SCI/cmake-build-debug/CMakeFiles/CMakeTmp'
+        
+        Run Build Command(s): /snap/clion/265/bin/ninja/linux/x64/ninja -v cmTC_fb7c9
+        [1/2] /usr/bin/cc   -mrdseed  -fdiagnostics-color=always -o CMakeFiles/cmTC_fb7c9.dir/rdseedtest.c.o -c /home/lyc/Desktop/EzPC/SCI/rdseedtest.c
+        [2/2] : && /usr/bin/cc -mrdseed -rdynamic CMakeFiles/cmTC_fb7c9.dir/rdseedtest.c.o -o cmTC_fb7c9   && :
+        
+      exitCode: 0
+    runResult:
+      variable: "RDSEED_RUN_RESULT"
+      cached: true
+      stdout: |
+      stderr: |
+      exitCode: 0
+...

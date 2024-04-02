@@ -1326,6 +1326,14 @@ build src/FloatingPoint/CMakeFiles/SCI-FloatingPoint.dir/__/__/tests/test_float_
   OBJECT_DIR = src/FloatingPoint/CMakeFiles/SCI-FloatingPoint.dir
   OBJECT_FILE_DIR = src/FloatingPoint/CMakeFiles/SCI-FloatingPoint.dir/__/__/tests
 
+build src/FloatingPoint/CMakeFiles/SCI-FloatingPoint.dir/__/__/tests/test_float_div_IN_ONE.cpp.o: CXX_COMPILER__SCI-FloatingPoint_unscanned_Debug /home/lyc/Desktop/EzPC/SCI/tests/test_float_div_IN_ONE.cpp || cmake_object_order_depends_target_SCI-FloatingPoint
+  DEFINES = -DSCI_OT=1
+  DEP_FILE = src/FloatingPoint/CMakeFiles/SCI-FloatingPoint.dir/__/__/tests/test_float_div_IN_ONE.cpp.o.d
+  FLAGS = -g -fdiagnostics-color=always -pthread -maes -msse4.1 -mavx -mavx2 -faligned-new -std=c++17 -O3 -Wno-parentheses-equality -Wno-deprecated-declarations -Wno-macro-redefined -mrdseed -fopenmp
+  INCLUDES = -I/home/lyc/Desktop/EzPC/SCI/src -isystem /home/lyc/Desktop/EzPC/SCI/extern/eigen
+  OBJECT_DIR = src/FloatingPoint/CMakeFiles/SCI-FloatingPoint.dir
+  OBJECT_FILE_DIR = src/FloatingPoint/CMakeFiles/SCI-FloatingPoint.dir/__/__/tests
+
 
 # =============================================================================
 # Link build statements for STATIC_LIBRARY target SCI-FloatingPoint
@@ -1334,7 +1342,7 @@ build src/FloatingPoint/CMakeFiles/SCI-FloatingPoint.dir/__/__/tests/test_float_
 #############################################
 # Link the static library lib/libSCI-FloatingPoint.a
 
-build lib/libSCI-FloatingPoint.a: CXX_STATIC_LIBRARY_LINKER__SCI-FloatingPoint_Debug src/FloatingPoint/CMakeFiles/SCI-FloatingPoint.dir/fp-math.cpp.o src/FloatingPoint/CMakeFiles/SCI-FloatingPoint.dir/floating-point.cpp.o src/FloatingPoint/CMakeFiles/SCI-FloatingPoint.dir/fixed-point.cpp.o src/FloatingPoint/CMakeFiles/SCI-FloatingPoint.dir/bool-data.cpp.o src/FloatingPoint/CMakeFiles/SCI-FloatingPoint.dir/__/__/tests/test_float_div.cpp.o src/FloatingPoint/CMakeFiles/SCI-FloatingPoint.dir/__/__/tests/test_float_bench_op.cpp.o src/FloatingPoint/CMakeFiles/SCI-FloatingPoint.dir/__/__/tests/test_float_primitive.cpp.o src/FloatingPoint/CMakeFiles/SCI-FloatingPoint.dir/__/__/tests/test_float_div_ALICE.cpp.o src/FloatingPoint/CMakeFiles/SCI-FloatingPoint.dir/__/__/tests/test_float_div_BOB.cpp.o || src/utils/SCI-utils
+build lib/libSCI-FloatingPoint.a: CXX_STATIC_LIBRARY_LINKER__SCI-FloatingPoint_Debug src/FloatingPoint/CMakeFiles/SCI-FloatingPoint.dir/fp-math.cpp.o src/FloatingPoint/CMakeFiles/SCI-FloatingPoint.dir/floating-point.cpp.o src/FloatingPoint/CMakeFiles/SCI-FloatingPoint.dir/fixed-point.cpp.o src/FloatingPoint/CMakeFiles/SCI-FloatingPoint.dir/bool-data.cpp.o src/FloatingPoint/CMakeFiles/SCI-FloatingPoint.dir/__/__/tests/test_float_div.cpp.o src/FloatingPoint/CMakeFiles/SCI-FloatingPoint.dir/__/__/tests/test_float_bench_op.cpp.o src/FloatingPoint/CMakeFiles/SCI-FloatingPoint.dir/__/__/tests/test_float_primitive.cpp.o src/FloatingPoint/CMakeFiles/SCI-FloatingPoint.dir/__/__/tests/test_float_div_ALICE.cpp.o src/FloatingPoint/CMakeFiles/SCI-FloatingPoint.dir/__/__/tests/test_float_div_BOB.cpp.o src/FloatingPoint/CMakeFiles/SCI-FloatingPoint.dir/__/__/tests/test_float_div_IN_ONE.cpp.o || src/utils/SCI-utils
   LANGUAGE_COMPILE_FLAGS = -g
   OBJECT_DIR = src/FloatingPoint/CMakeFiles/SCI-FloatingPoint.dir
   POST_BUILD = :

@@ -27,6 +27,37 @@ SOFTWARE.
 using namespace std;
 using namespace sci;
 
+
+void test_div(FPOp *fp_op_, int party_, int sz_, float f_, uint8_t m_bits_, uint8_t e_bits_, bool verbose) {
+    assert(party_ != PUBLIC);
+
+    //Convert type from 'float' to 'FPArray'
+    FPArray fp_1 = fp_op_->input<float>(party_, sz_, f_, m_bits_, e_bits_);
+    FPArray fp_2 = fp_op_->input<float>(party_, sz_, -1.0, m_bits_, e_bits_);
+
+    //Operate Division
+    //TODO:
+    // 1. print the shares of each party
+    // 2. try to reconstruct the result manually
+    // 3. reveal the immediate result in the process of computation
+    FPArray fp_res = fp_op_->div(fp_1, fp_2);
+    cout<<fp_res.party<<endl;
+    cout<<fp_res.z<<endl;
+    cout<<fp_res.s<<endl;
+    cout<<fp_res.e<<endl;
+    cout<<fp_res.m<<endl;
+
+    //Output the Result
+    FPArray fp_pub = fp_op_->output(PUBLIC, fp_res);
+    vector<float> vf_ = fp_pub.get_native_type<float>();
+    if (verbose) {
+        cout << "\n\033[33m f: \t\t\033[35m" << f_ << "\n"\
+ << "\033[33m fp_pub(FPArray):\t\033[35m" << fp_pub << "\n"\
+ << "\033[33m vf_[0](vector item):\t\033[35m" << vf_[0] << "\n\033[0m" << endl;
+    }
+}
+
+
 FPArray FPArray::subset(int i, int j) {
   assert(i >= 0 && j <= size && i < j);
   int sz = j - i;
@@ -1328,8 +1359,8 @@ vector<FPArray> FPOp::div(const vector<FPArray> &x, const FPArray &y, bool cheap
   assert(x[0].size == y.size);
   assert(x[0].m_bits == y.m_bits);
   assert(x[0].e_bits == y.e_bits);
-  int N = x.size();
-  int n = x[0].size;
+  int N = x.size();                 //how many numbers in x (vector)
+  int n = x[0].size;                //size of array in x[i] (FPArray)
   for (int i = 1; i < N; i++) {
     assert(x[0].party == x[i].party);
     assert(x[0].size == x[i].size);
