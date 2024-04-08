@@ -38,7 +38,7 @@ void test_div(FPOp *fp_op_, int party_, int sz_, float f_, uint8_t m_bits_, uint
     //Operate Division
     //TODO:
     // 1. print the shares of each party
-    // 2. try to reconstruct the result manually
+    // 2. try to reconstruct the result manually (or find the reconstruct function)
     // 3. reveal the immediate result in the process of computation
     FPArray fp_res = fp_op_->div(fp_1, fp_2);
     cout<<fp_res.party<<endl;
