@@ -37,23 +37,23 @@ void test_div(FPOp *fp_op_, int party_, int sz_, float f_, uint8_t m_bits_, uint
 
     //Operate Division
     //TODO:
-    // 1. print the shares of each party
+    // 1. (completed) print the shares of each party
     // 2. try to reconstruct the result manually (or find the reconstruct function)
     // 3. reveal the immediate result in the process of computation
     FPArray fp_res = fp_op_->div(fp_1, fp_2);
     cout<<fp_res.party<<endl;
-    cout<<fp_res.z<<endl;
-    cout<<fp_res.s<<endl;
-    cout<<fp_res.e<<endl;
-    cout<<fp_res.m<<endl;
+    cout<<"\n\033[33mz share:"<<"\033[35m"<<(int(*(fp_res.z)))<<endl;
+    cout<<"\033[33ms share:"<<"\033[35m"<<(int(*(fp_res.s)))<<endl;
+    cout<<"\033[33me share:"<<"\033[35m"<<(string)(bitset<64>(*(fp_res.e)).to_string())<<endl;
+    cout<<"\033[33mm share:"<<"\033[35m"<<(string)(bitset<64>(*(fp_res.m)).to_string())<<"\033[0m\n"<<endl;
 
     //Output the Result
     FPArray fp_pub = fp_op_->output(PUBLIC, fp_res);
     vector<float> vf_ = fp_pub.get_native_type<float>();
     if (verbose) {
-        cout << "\n\033[33m f: \t\t\033[35m" << f_ << "\n"\
- << "\033[33m fp_pub(FPArray):\t\033[35m" << fp_pub << "\n"\
- << "\033[33m vf_[0](vector item):\t\033[35m" << vf_[0] << "\n\033[0m" << endl;
+        cout << "\n\033[33mf: \033[35m" << f_ << "\n"\
+        << "\033[33mfp_pub(FPArray):\033[35m" << fp_pub << "\n"\
+        << "\033[33mvf_[0](vector item):\033[35m" << vf_[0] << "\n\033[0m" << endl;
     }
 }
 
