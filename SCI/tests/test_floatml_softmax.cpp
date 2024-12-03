@@ -21,7 +21,7 @@ int main (int __argc, char **__argv) {
 
 	if (rows == 0 || sz == 0) {
 		rows = 1000 ;
-		sz = 100 ;
+		sz = 3 ;
 	}
 
 

@@ -23,7 +23,7 @@ int main (int __argc, char **__argv) {
 	vector<FPArray> inp1 = make_vector_float_rand(ALICE, sz) ;
 	vector<FPArray> out = make_vector_float(ALICE, sz) ;
 
-	Sigmoid(sz, inp1, out) ;
+	Tanh(sz, inp1, out) ;
 	__end() ;
 	return 0 ;
 }

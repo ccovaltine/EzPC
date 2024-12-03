@@ -40,7 +40,7 @@ IOPack *iopack = nullptr;
 OTPack *otpack = nullptr;
 FPMath *fp_math = nullptr;
 int m_bits = 23, e_bits = 8;
-int sz = 8192;
+int sz = 3;
 int party = 1;
 string address = "127.0.0.1";
 int port = 8000;

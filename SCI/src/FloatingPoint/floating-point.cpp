@@ -1225,93 +1225,241 @@ FPArray FPOp::sub(const FPArray &x, const FPArray &y, bool cheap_variant,
   return this->add(x, neg_y, cheap_variant, compare_and_swap, check_bounds);
 }
 
-vector<FixArray> quotient_mantissa(FixOp *fix, const vector<FixArray> &m1, const FixArray &m2,
-                           bool cheap_variant) {
+FixArray lyc_float_to_fix(FixOp *fix, float value){
+  const int bit_length = 27;
+  const int scale = 23;
+  const int scale_factor = 1 << scale;
+
+  bool sign = false;
+  if(value < 0){
+    sign = true;
+    value *= -1;
+  }
+  uint64_t fixed_value = static_cast<uint64_t>(value * scale_factor);
+  FixArray res = fix->input(ALICE, 1, fixed_value, sign, bit_length, scale);
+  return res;
+}
+
+vector<FixArray> lyc_quotient_mantissa(FixOp *fix, const vector<FixArray> &m1, const FixArray &m2){
+  // 1. 确保
+  // 确保被除数和除数都不是公共数据，且具有相同的尺寸和比例因子
   assert(m1[0].party != PUBLIC && m2.party != PUBLIC);
   assert(m1[0].size == m2.size);
   assert(m1[0].ell == (m2.ell + 2));
+  // 确保所有被除数具有相同的属性
   int N = m1.size();
   for (int i = 1; i < N; i++) {
     assert(m1[0].party == m1[i].party);
     assert(m1[0].size == m1[i].size);
     assert(m1[0].ell == m1[i].ell);
   }
+  // 确保m_bits的值不超过27，以符合算法的限制
   int m_bits = m2.ell - 1;
   assert(m_bits <= 27);
+
+  // 2. 计算得到 φ = 1 / a*m2
+  FixArray phi = fix->output(PUBLIC, m2);
+  vector<float> phi_native = phi.get_native_type<float>();
+//  cout << "phi_native:" << endl;
+  for(int i=0; i<m2.size; i++){
+    phi_native[i] = 1 / phi_native[i];
+//    cout << phi_native[i] << endl;
+  }
+//  cout << endl;
+
+  // 3. 计算得到 γ = a*m1
+  FixArray m1_flat = concat(m1);
+  FixArray gama_flat = fix->output(PUBLIC, m1_flat);
+//  cout << "gama_flat:" << endl;
+//  cout << gama_flat << endl;
+//  cout << endl;
+  vector<float> gama_flat_native = gama_flat.get_native_type<float>();
+
+
+  // 4. 计算 q = γ * φ
+  vector<float> q_flat_native(gama_flat_native.size());
+//  cout << "q_flat_native:" << endl;
+  for(int i=0; i<N; i++){
+    for(int j=0; j<m2.size; j++){
+      q_flat_native[i * N + j] = gama_flat_native[i * N + j] * phi_native[j];
+//      cout << q_flat_native[i*N+j] << " = " << gama_flat_native[i * N + j] << " * " << phi_native[j] << "\n";
+    }
+  }
+  cout << endl;
+
+  // 5. 把 q 转换为 m1 的格式 (q_flat_native -> q_flat -> q)
+  vector<FixArray> q_flat(q_flat_native.size());
+  for(int i=0; i<q_flat_native.size(); i++){
+    q_flat[i] = lyc_float_to_fix(fix, q_flat_native[i]);
+  }
+
+  FixArray q_flat_in_one = concat(q_flat);
+  vector<FixArray> q(N);
+  for (int i = 0; i < N; i++) {
+    q[i] = q_flat_in_one.subset(i*m2.size, (i+1)*m2.size);
+  }
+
+  return q;
+ }
+
+/**
+ * 计算商的尾数部分
+ *
+ * 该函数通过一系列固定点操作计算两个固定点数数组相除的商的尾数部分
+ * 主要采用了近似计算和查表的方法来实现除法操作，以提高计算效率
+ *
+ * @param fix 固定点操作对象，用于执行固定点数的各类操作
+ * @param m1 被除数数组，包含多个固定点数
+ * @param m2 除数数组，包含多个固定点数
+ * @param cheap_variant 是否使用简化版算法，简化版算法在精度上可能有所牺牲
+ * @return 返回一个向量，包含每个被除数与除数相除得到的商的尾数部分
+ *
+ * 函数首先进行一系列断言以确保输入数据的合法性，然后根据除数的特性
+ * 选择合适的迭代次数和比例因子进行近似计算，之后通过查表和一系列固定点
+ * 运算得到最终的商的尾数部分
+ */
+vector<FixArray> quotient_mantissa(FixOp *fix, const vector<FixArray> &m1, const FixArray &m2,
+                           bool cheap_variant) {
+  // 确保被除数和除数都不是公共数据，且具有相同的尺寸和比例因子
+  assert(m1[0].party != PUBLIC && m2.party != PUBLIC);
+  assert(m1[0].size == m2.size);
+  assert(m1[0].ell == (m2.ell + 2));
+
+  int N = m1.size();
+  // 确保所有被除数具有相同的属性
+  for (int i = 1; i < N; i++) {
+    assert(m1[0].party == m1[i].party);
+    assert(m1[0].size == m1[i].size);
+    assert(m1[0].ell == m1[i].ell);
+  }
+
+  int m_bits = m2.ell - 1;
+  // 确保m_bits的值不超过27，以符合算法的限制
+  assert(m_bits <= 27);
+
+  // 初始化全0和全1的布尔数组，用于后续的固定点运算
   BoolArray all_0 = fix->bool_op->input(ALICE, m2.size, uint8_t(0));
   BoolArray all_1 = fix->bool_op->input(ALICE, m2.size, 1);
 
   int num_iter;
+  // 根据m_bits的值确定迭代次数
   if (m_bits == BFLOAT16_M_BITS) {
     num_iter = 1;
   } else {
     num_iter = 2;
   }
+
+  // 计算比例因子p，用于近似计算
   int p = ceil((m_bits + 1) / double(1 << num_iter)) + 1;
 
-  // idx = m >> (m_bits-p) mod 2^{p}
+  // 计算索引值，用于查表
   FixArray idx = fix->reduce(fix->truncate_reduce(m2, m_bits - p), p);
   int k = 1 << p;
   vector<uint64_t> spec_vec_r(1 << p);
   int32_t scale_curr = p + 1;
+  // 生成查表用的向量，用于近似计算
   for (int i = 0; i < (1 << p); i++) {
     double u = (1.0 + (double(i) / double(k)));
     double Y = 1.0 / u;
     spec_vec_r[i] = (Y * (1ULL << scale_curr));
   }
+
+  // 通过查表得到初始的商的尾数部分
   FixArray r = fix->LUT(spec_vec_r, idx, false, scale_curr + 2, scale_curr, p);
+
+  // 迭代 refine 商的尾数部分
   for (int i = 1; i <= num_iter; i++) {
+    // 计算下一次迭代的scale值
     int32_t scale_next = (1 << i) * (p - 1) + 3;
-    FixArray m2r =
-        fix->mul(m2, r, scale_curr + m_bits + 2, all_1.data, all_0.data);
+    // 乘法操作，扩展精度
+    FixArray m2r = fix->mul(m2, r, scale_curr + m_bits + 2, all_1.data, all_0.data);
+    // 截断和约简操作，调整精度
     m2r = fix->truncate_reduce(m2r, m_bits + scale_curr - scale_next);
+    // 计算差值
     FixArray e = fix->sub(1ULL << scale_next, m2r);
+    // 商的更新准备，比例调整
     FixArray r_new = fix->scale_up(r, scale_next + 2, scale_next);
+    // 设置符号位，准备进行有符号乘法
     e.signed_ = true;
     r.signed_ = true; // changing signed_ to enable signed mult
-    FixArray re =
-        fix->mul(r, e, scale_curr + scale_next + 2, all_0.data, nullptr);
+    // 乘法操作，这里的结果用于后续的商的更新
+    FixArray re = fix->mul(r, e, scale_curr + scale_next + 2, all_0.data, nullptr);
+    // 重置为无符号运算
     re.signed_ = false; // switching back to unsigned arithmetic
+    // 商的更新
     r = fix->add(r_new, fix->truncate_reduce(re, scale_curr));
+    // 更新当前的scale值
     scale_curr = scale_next;
   }
 
+  // test output
+//  FixArray r_pub = fix->output(PUBLIC, r);
+//  cout << "r_pub:" << endl;
+//  cout << r_pub << "\n" << endl;
+
+  // 复制商的尾数部分以匹配被除数数组的长度
   FixArray r_replicated(r.party, N*r.size, r.signed_, r.ell, r.s);
   FixArray m2_replicated(m2.party, N*m2.size, m2.signed_, m2.ell, m2.s);
+  // 在新分配的数组中复制原始数据，以便进行后续的计算
   for (int i = 0; i < N; i++) {
     memcpy(r_replicated.data + i*r.size, r.data, r.size * sizeof(uint64_t));
     memcpy(m2_replicated.data + i*m2.size, m2.data, m2.size * sizeof(uint64_t));
   }
+
+  // 创建一个扩展后的固定点数组，用于后续操作
   FixArray m2_ext_replicated(m2.party, N*m2.size, m2.signed_, m_bits+3, m2.s);
+
+  // 如果不使用廉价变体，则执行更复杂的扩展和复制操作
   if (!cheap_variant) {
+      // 扩展m2数组，以适应更多的位数
       FixArray m2_ext = fix->extend(m2, m_bits + 3, all_1.data);
+      // 将扩展后的数组内容复制到m2_ext_replicated中
       for (int i = 0; i < N; i++) {
         memcpy(m2_ext_replicated.data + i*m2.size, m2_ext.data, m2.size * sizeof(uint64_t));
       }
       m2_ext_replicated.s = 2 * m_bits;
   }
+
+  // 创建全0和全1的布尔数组，用于后续的逻辑运算
   BoolArray all_0_flat = fix->bool_op->input(ALICE, N*m2.size, uint8_t(0));
   BoolArray all_1_flat = fix->bool_op->input(ALICE, N*m2.size, 1);
 
+  // 初始化q_flat数组，以及将m1拼接成一个平面数组
   FixArray q_flat;
   FixArray m1_flat = concat(m1);
+  // test output
+//  FixArray m1_flat_pub = fix->output(PUBLIC, m1_flat);
+//  cout << "m1_flat_pub:" << endl;
+//  cout << m1_flat_pub << "\n" << endl;
+
+  // 根据cheap_variant标志选择不同的计算方式
+//  FixArray q_flat_pub;
   if (cheap_variant) {
-    q_flat = fix->mul(m1_flat, r_replicated, scale_curr + m_bits + 1, all_0_flat.data, all_0_flat.data);
-    q_flat = fix->truncate_reduce(q_flat, scale_curr);
+      // 使用较简单的方式计算q_flat
+      q_flat = fix->mul(m1_flat, r_replicated, scale_curr + m_bits + 1, all_0_flat.data, all_0_flat.data);
+      q_flat = fix->truncate_reduce(q_flat, scale_curr);
   } else {
-    q_flat = fix->mul(m1_flat, r_replicated, scale_curr + m_bits + 2, all_0_flat.data, all_0_flat.data);
-    q_flat = fix->truncate_reduce(q_flat, scale_curr);
-    FixArray m2q = fix->mul(m2_replicated, q_flat, m_bits + 3, all_1_flat.data, all_0_flat.data);
-    FixArray m2q_plus_1 = fix->add(m2q, m2_ext_replicated);
-    FixArray m1_scaled = fix->scale_up(m1_flat, m_bits + 3, 2 * m_bits + 1);
-    m1_scaled.s -= 1;
-    BoolArray lt, eq;
-    tie(lt, eq) = fix->LT_and_EQ(fix->add(m2q, m2q_plus_1), m1_scaled);
-    BoolArray odd_repr = fix->LSB(q_flat);
-    BoolArray add_1 = fix->bool_op->XOR(lt, fix->bool_op->AND(odd_repr, eq));
-    q_flat = fix->if_else(add_1, fix->add(q_flat, 1), q_flat);
+      // 使用更复杂的方式计算q_flat，包括多次乘法、加法和逻辑比较
+      q_flat = fix->mul(m1_flat, r_replicated, scale_curr + m_bits + 2, all_0_flat.data, all_0_flat.data);
+
+      q_flat = fix->truncate_reduce(q_flat, scale_curr);
+
+      FixArray m2q = fix->mul(m2_replicated, q_flat, m_bits + 3, all_1_flat.data, all_0_flat.data);
+      FixArray m2q_plus_1 = fix->add(m2q, m2_ext_replicated);
+      FixArray m1_scaled = fix->scale_up(m1_flat, m_bits + 3, 2 * m_bits + 1);
+      m1_scaled.s -= 1;
+      BoolArray lt, eq;
+      tie(lt, eq) = fix->LT_and_EQ(fix->add(m2q, m2q_plus_1), m1_scaled);
+      BoolArray odd_repr = fix->LSB(q_flat);
+      BoolArray add_1 = fix->bool_op->XOR(lt, fix->bool_op->AND(odd_repr, eq));
+      q_flat = fix->if_else(add_1, fix->add(q_flat, 1), q_flat);
   }
+  // 最后对q_flat进行缩减操作，以适应所需的位数
   q_flat = fix->reduce(q_flat, m_bits + 1);
+//  q_flat_pub = fix->output(PUBLIC, q_flat);
+//  cout << "q_flat:" << endl;
+//  cout << q_flat_pub << endl;
+//  cout << endl;
 
   vector<FixArray> q(N);
   for (int i = 0; i < N; i++) {
@@ -1320,6 +1468,7 @@ vector<FixArray> quotient_mantissa(FixOp *fix, const vector<FixArray> &m1, const
 
   return q;
 }
+
 
 vector<FPArray> FPOp::div(const vector<FPArray> &x, const FPArray &y, bool cheap_variant,
                   bool check_bounds) {
@@ -1372,7 +1521,12 @@ vector<FPArray> FPOp::div(const vector<FPArray> &x, const FPArray &y, bool cheap
     x_m[i] = x_m_flat.subset(i*n, (i+1)*n);
   }
 
-  vector<FixArray> q = quotient_mantissa(fix, x_m, y_m, cheap_variant);
+  // lyc:
+  vector<FixArray> q = lyc_quotient_mantissa(fix, x_m, y_m);
+
+  // original:
+  // vector<FixArray> q = quotient_mantissa(fix, x_m, y_m, cheap_variant);
+
   FixArray q_flat = concat(q);
 
   BoolArray ret_s_flat = bool_op->XOR(x_s_flat, y_s_replicated);

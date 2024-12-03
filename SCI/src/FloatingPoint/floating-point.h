@@ -433,6 +433,7 @@ public:
 
   vector<FPArray> div(const vector<FPArray> &x, const FPArray &y, bool cheap_variant = false,
               bool check_bounds = true);
+
   // Division: returns x[i] / y[i]
   // If cheap_variant is set to true, division is cheaper in cost but does not return correctly rounded results
   // check_bounds is an optional parameter which rounds to 0/inf in case of underflows/overflows after division
