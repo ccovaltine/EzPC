@@ -10,7 +10,7 @@ message(STATUS "Option: NO_REVEAL_OUTPUT = ${NO_REVEAL_OUTPUT}")
 option(BUILD_TESTS "Build tests" ON)
 message(STATUS "Option: BUILD_TESTS = ${BUILD_TESTS}")
 
-option(BUILD_NETWORKS "Build networks" OFF)
+option(BUILD_NETWORKS "Build networks" ON)
 message(STATUS "Option: BUILD_NETWORKS = ${BUILD_NETWORKS}")
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)

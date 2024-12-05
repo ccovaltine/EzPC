@@ -1225,82 +1225,6 @@ FPArray FPOp::sub(const FPArray &x, const FPArray &y, bool cheap_variant,
   return this->add(x, neg_y, cheap_variant, compare_and_swap, check_bounds);
 }
 
-FixArray lyc_float_to_fix(FixOp *fix, float value){
-  const int bit_length = 27;
-  const int scale = 23;
-  const int scale_factor = 1 << scale;
-
-  bool sign = false;
-  if(value < 0){
-    sign = true;
-    value *= -1;
-  }
-  uint64_t fixed_value = static_cast<uint64_t>(value * scale_factor);
-  FixArray res = fix->input(ALICE, 1, fixed_value, sign, bit_length, scale);
-  return res;
-}
-
-vector<FixArray> lyc_quotient_mantissa(FixOp *fix, const vector<FixArray> &m1, const FixArray &m2){
-  // 1. 确保
-  // 确保被除数和除数都不是公共数据，且具有相同的尺寸和比例因子
-  assert(m1[0].party != PUBLIC && m2.party != PUBLIC);
-  assert(m1[0].size == m2.size);
-  assert(m1[0].ell == (m2.ell + 2));
-  // 确保所有被除数具有相同的属性
-  int N = m1.size();
-  for (int i = 1; i < N; i++) {
-    assert(m1[0].party == m1[i].party);
-    assert(m1[0].size == m1[i].size);
-    assert(m1[0].ell == m1[i].ell);
-  }
-  // 确保m_bits的值不超过27，以符合算法的限制
-  int m_bits = m2.ell - 1;
-  assert(m_bits <= 27);
-
-  // 2. 计算得到 φ = 1 / a*m2
-  FixArray phi = fix->output(PUBLIC, m2);
-  vector<float> phi_native = phi.get_native_type<float>();
-//  cout << "phi_native:" << endl;
-  for(int i=0; i<m2.size; i++){
-    phi_native[i] = 1 / phi_native[i];
-//    cout << phi_native[i] << endl;
-  }
-//  cout << endl;
-
-  // 3. 计算得到 γ = a*m1
-  FixArray m1_flat = concat(m1);
-  FixArray gama_flat = fix->output(PUBLIC, m1_flat);
-//  cout << "gama_flat:" << endl;
-//  cout << gama_flat << endl;
-//  cout << endl;
-  vector<float> gama_flat_native = gama_flat.get_native_type<float>();
-
-
-  // 4. 计算 q = γ * φ
-  vector<float> q_flat_native(gama_flat_native.size());
-//  cout << "q_flat_native:" << endl;
-  for(int i=0; i<N; i++){
-    for(int j=0; j<m2.size; j++){
-      q_flat_native[i * N + j] = gama_flat_native[i * N + j] * phi_native[j];
-//      cout << q_flat_native[i*N+j] << " = " << gama_flat_native[i * N + j] << " * " << phi_native[j] << "\n";
-    }
-  }
-  cout << endl;
-
-  // 5. 把 q 转换为 m1 的格式 (q_flat_native -> q_flat -> q)
-  vector<FixArray> q_flat(q_flat_native.size());
-  for(int i=0; i<q_flat_native.size(); i++){
-    q_flat[i] = lyc_float_to_fix(fix, q_flat_native[i]);
-  }
-
-  FixArray q_flat_in_one = concat(q_flat);
-  vector<FixArray> q(N);
-  for (int i = 0; i < N; i++) {
-    q[i] = q_flat_in_one.subset(i*m2.size, (i+1)*m2.size);
-  }
-
-  return q;
- }
 
 /**
  * 计算商的尾数部分
@@ -1470,6 +1394,88 @@ vector<FixArray> quotient_mantissa(FixOp *fix, const vector<FixArray> &m1, const
 }
 
 
+FixArray lyc_float_to_fix(FixOp *fix, float value){
+  const int bit_length = 27;
+  const int scale = 23;
+  const int scale_factor = 1 << scale;
+
+  bool sign = false;
+  if(value < 0){
+    sign = true;
+    value *= -1;
+  }
+  uint64_t fixed_value = static_cast<uint64_t>(value * scale_factor);
+  FixArray res = fix->input(ALICE, 1, fixed_value, sign, bit_length, scale);
+  return res;
+}
+
+vector<FixArray> lyc_quotient_mantissa(FixOp *fix, const vector<FixArray> &m1, const FixArray &m2){
+  // 1. 确保
+  // 确保被除数和除数都不是公共数据，且具有相同的尺寸和比例因子
+  assert(m1[0].party != PUBLIC && m2.party != PUBLIC);
+  assert(m1[0].size == m2.size);
+  assert(m1[0].ell == (m2.ell + 2));
+  // 确保所有被除数具有相同的属性
+  int N = m1.size();
+  for (int i = 1; i < N; i++) {
+    assert(m1[0].party == m1[i].party);
+    assert(m1[0].size == m1[i].size);
+    assert(m1[0].ell == m1[i].ell);
+  }
+  // 确保m_bits的值不超过27，以符合算法的限制
+  int m_bits = m2.ell - 1;
+  assert(m_bits <= 27);
+
+  // 2. 计算得到 φ = 1 / a*m2
+  FixArray phi = fix->output(PUBLIC, m2);
+  vector<float> phi_native = phi.get_native_type<float>();
+//  cout << "phi_native:" << endl;
+  for(int i=0; i<m2.size; i++){
+    if(phi_native[i] == 0){
+      phi_native[i] = 1e30;
+    }else{
+      phi_native[i] = 1 / phi_native[i];
+    }
+//    cout << phi_native[i] << endl;
+  }
+//  cout << endl;
+
+  // 3. 计算得到 γ = a*m1
+  FixArray m1_flat = concat(m1);
+  FixArray gama_flat = fix->output(PUBLIC, m1_flat);
+//  cout << "gama_flat:" << endl;
+//  cout << gama_flat << endl;
+//  cout << endl;
+  vector<float> gama_flat_native = gama_flat.get_native_type<float>();
+
+
+  // 4. 计算 q = γ * φ
+  vector<float> q_flat_native(gama_flat_native.size());
+//  cout << "q_flat_native:" << endl;
+  for(int i=0; i<N; i++){
+    for(int j=0; j<m2.size; j++){
+      q_flat_native[i * N + j] = gama_flat_native[i * N + j] * phi_native[j];
+//      cout << q_flat_native[i*N+j] << " = " << gama_flat_native[i * N + j] << " * " << phi_native[j] << "\n";
+    }
+  }
+  cout << endl;
+
+  // 5. 把 q 转换为 m1 的格式 (q_flat_native -> q_flat -> q)
+  vector<FixArray> q_flat(q_flat_native.size());
+  for(int i=0; i<q_flat_native.size(); i++){
+    q_flat[i] = lyc_float_to_fix(fix, q_flat_native[i]);
+  }
+
+  FixArray q_flat_in_one = concat(q_flat);
+  vector<FixArray> q(N);
+  for (int i = 0; i < N; i++) {
+    q[i] = q_flat_in_one.subset(i*m2.size, (i+1)*m2.size);
+  }
+
+  return q;
+ }
+
+
 vector<FPArray> FPOp::div(const vector<FPArray> &x, const FPArray &y, bool cheap_variant,
                   bool check_bounds) {
   assert(x[0].party != PUBLIC && y.party != PUBLIC);
@@ -1522,10 +1528,10 @@ vector<FPArray> FPOp::div(const vector<FPArray> &x, const FPArray &y, bool cheap
   }
 
   // lyc:
-  vector<FixArray> q = lyc_quotient_mantissa(fix, x_m, y_m);
+  // vector<FixArray> q = lyc_quotient_mantissa(fix, x_m, y_m);
 
   // original:
-  // vector<FixArray> q = quotient_mantissa(fix, x_m, y_m, cheap_variant);
+  vector<FixArray> q = quotient_mantissa(fix, x_m, y_m, cheap_variant);
 
   FixArray q_flat = concat(q);
 

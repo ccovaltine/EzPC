@@ -6,7 +6,7 @@
 
 #include "library_float.h"
 
-int32_t BATCH = 128 ;
+int32_t BATCH = 2 ;
 
 using namespace std ;
 using namespace sci ;
@@ -248,7 +248,11 @@ start = clock_start() ;
 initial_rounds = __iopack->get_rounds();
 comm_start = __get_comm() ;
 
-Softmax2(BATCH, 10, layer3Temp, fwdOut);
+// lyc experiment shows that this is the problem(using lyc_quotient_mantissa): 
+//      corrupted size vs. prev_size
+//      Aborted (core dumped)
+
+Softmax2(BATCH, 10, layer3Temp, fwdOut); 
 
 t = time_from(start);
 comm_end = __get_comm() ;
@@ -354,7 +358,7 @@ getBiasDer(BATCH, 128, layer1Der, layer1bDer);
 t = time_from(start);
 comm_end = __get_comm() ;
 
-printf("\tLayer 2 done\n") ;
+printf("\tLayer 1 done\n") ;
 
 linear_time += t/1000.0 ;
 linear_comm += (comm_end - comm_start)/(1<<20) ;

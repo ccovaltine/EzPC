@@ -7,7 +7,7 @@
 
 #include "library_float.h"
 
-int32_t BATCH = 128;
+int32_t BATCH = 1;
 
 using namespace std ;
 using namespace sci ;
@@ -1060,6 +1060,7 @@ int fwd_rounds=0 ;
 float back_time=0.0, back_comm=0.0 ;
 int back_rounds=0 ;
 
+cout << "Begin Computing..." << endl;
 for (uint32_t i = 0; i < 1; i++) {
 	vector < vector < FPArray > > fwdOut = make_vector_float(ALICE, 128, 10) ;
 	vector < FPArray > loss = make_vector_float(ALICE, 1) ;
