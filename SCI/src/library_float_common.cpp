@@ -222,15 +222,18 @@ vector<BoolArray> make_vector_bool_rand(int party, size_t last) {
 }
 
 vector<int> get_chunks(int items, int slots) {
-	int allocated, chunk, remaining ;
+	// int allocated, chunk, remaining ;
 
-	chunk = items/slots ;
-	vector<int> ret(slots, chunk) ;
+	// chunk = items/slots ;
+	// vector<int> ret(slots, chunk) ;
 
-	allocated = chunk*slots ;
-	remaining = items - allocated ;
-	for (int i = 0 ; i < remaining ; i++)
-		ret[i]++ ;
+	// allocated = chunk*slots ;
+	// remaining = items - allocated ;
+	// for (int i = 0 ; i < remaining ; i++)
+	// 	ret[i]++ ;
+
+	vector<int> ret(slots, 0) ;
+	ret[0] = items;
 
 	return ret ;
 }

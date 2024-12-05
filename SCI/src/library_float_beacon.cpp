@@ -263,82 +263,110 @@ void Softmax2_thread(
 	}
 }
 
+/**
+ * 实现Softmax函数的多线程版本
+ * 该函数接受两个尺寸参数和两个浮点数数组，计算Softmax函数的输出
+ * 
+ * @param s1 第一个维度的大小，通常代表批处理大小
+ * @param s2 第二个维度的大小，通常代表类别数
+ * @param inArr 输入数组，包含需要进行Softmax计算的数据
+ * @param outArr 输出数组，存放计算结果
+ */
 void Softmax2(
-	int32_t s1, 
-	int32_t s2, 
-	vector<vector<FPArray>> &inArr, 
-	vector<vector<FPArray>> &outArr) {
-	int m_bits = inArr[0][0].m_bits ;
-	int e_bits = inArr[0][0].e_bits ;
+    int32_t s1, 
+    int32_t s2, 
+    vector<vector<FPArray>> &inArr, 
+    vector<vector<FPArray>> &outArr) {
+    // 获取输入数组中浮点数的位数信息
+    int m_bits = inArr[0][0].m_bits;
+    int e_bits = inArr[0][0].e_bits;
 
-	uint8_t **row_s = new uint8_t*[s1] ;
-	uint8_t **row_z = new uint8_t*[s1] ;
-	uint64_t **row_m = new uint64_t*[s1] ;
-	uint64_t **row_e = new uint64_t*[s1] ;
+    // 为输入和输出数组分配临时内存空间，以便进行并行计算
+    uint8_t **row_s = new uint8_t*[s1];
+    uint8_t **row_z = new uint8_t*[s1];
+    uint64_t **row_m = new uint64_t*[s1];
+    uint64_t **row_e = new uint64_t*[s1];
 
-	uint8_t **out_s = new uint8_t*[s1] ;
-	uint8_t **out_z = new uint8_t*[s1] ;
-	uint64_t **out_m = new uint64_t*[s1] ;
-	uint64_t **out_e = new uint64_t*[s1] ;
+    uint8_t **out_s = new uint8_t*[s1];
+    uint8_t **out_z = new uint8_t*[s1];
+    uint64_t **out_m = new uint64_t*[s1];
+    uint64_t **out_e = new uint64_t*[s1];
 
-	for (int i = 0 ; i < s1 ; i++) {
-		row_s[i] = new uint8_t[s2] ;
-		row_z[i] = new uint8_t[s2] ;
-		row_m[i] = new uint64_t[s2] ;
-		row_e[i] = new uint64_t[s2] ;
+    // 初始化临时内存空间，并将输入数据复制到临时空间
+    for (int i = 0; i < s1; i++) {
+        row_s[i] = new uint8_t[s2];
+        row_z[i] = new uint8_t[s2];
+        row_m[i] = new uint64_t[s2];
+        row_e[i] = new uint64_t[s2];
 
-		out_s[i] = new uint8_t[s2] ;
-		out_z[i] = new uint8_t[s2] ;
-		out_m[i] = new uint64_t[s2] ;
-		out_e[i] = new uint64_t[s2] ;
+        out_s[i] = new uint8_t[s2];
+        out_z[i] = new uint8_t[s2];
+        out_m[i] = new uint64_t[s2];
+        out_e[i] = new uint64_t[s2];
 
-		for (int j = 0 ; j < s2 ; j++) {
-			row_s[i][j] = inArr[i][j].s[0] ;
-			row_z[i][j] = inArr[i][j].z[0] ;
-			row_m[i][j] = inArr[i][j].m[0] ;
-			row_e[i][j] = inArr[i][j].e[0] ;
-		}
-	}
+        for (int j = 0; j < s2; j++) {
+            row_s[i][j] = inArr[i][j].s[0];
+            row_z[i][j] = inArr[i][j].z[0];
+            row_m[i][j] = inArr[i][j].m[0];
+            row_e[i][j] = inArr[i][j].e[0];
+        }
+    }
 
-	vector<int> chunks = get_chunks(s1, __nt) ;
-	thread threads[MAX_THREADS] ;
-	int offset = 0 ;
-	for (int i = 0 ; i < __nt ; i++) {
-		if (chunks[i] > 0) {
-			threads[i] = thread(Softmax2_thread,
-				i, chunks[i], s2, m_bits, e_bits,
-				row_s+offset, row_z+offset, row_m+offset, row_e+offset,
-				out_s+offset, out_z+offset, out_m+offset, out_e+offset
-			) ;
-			offset += chunks[i] ;
-		}
-	}
+    // 根据输入尺寸和线程数，将任务划分为多个块
+    vector<int> chunks = get_chunks(s1, __nt);
+    thread threads[MAX_THREADS];
 
-	for (int i = 0 ; i < __nt ; i++)
-		if (chunks[i] > 0)
-			threads[i].join() ;
+	// cout << "s1: " << s1 << endl;
+	// cout << "_nt: " << __nt << endl;
 
+	// cout << "chunks size: " << chunks.size() << endl;
+	// cout << "chunks: " << endl;
+	// for (int i = 0; i < chunks.size(); i++)
+	// 	cout << chunks[i] << " ";
+	// cout << endl;
 
-	for (int i = 0 ; i < s1 ; i++) {
-		for (int j = 0 ; j < s2 ; j++) {
-			outArr[i][j].s[0] = out_s[i][j] ;
-			outArr[i][j].z[0] = out_z[i][j] ;
-			outArr[i][j].m[0] = out_m[i][j] ;
-			outArr[i][j].e[0] = out_e[i][j] ;
-		}
-	}
+    int offset = 0;
+    // 创建并启动多个线程，每个线程处理一个块的数据
+    for (int i = 0; i < __nt; i++) {
+        if (chunks[i] > 0) {
+            threads[i] = thread(Softmax2_thread,
+                i, chunks[i], s2, m_bits, e_bits,
+                row_s+offset, row_z+offset, row_m+offset, row_e+offset,
+                out_s+offset, out_z+offset, out_m+offset, out_e+offset
+            );
+            offset += chunks[i];
+        }
+    }
 
-	for (int i = 0 ; i < s1 ; i++) {
-		delete[] row_s[i] ; delete[] out_s[i] ;
-		delete[] row_z[i] ; delete[] out_z[i] ;
-		delete[] row_m[i] ; delete[] out_m[i] ;
-		delete[] row_e[i] ; delete[] out_e[i] ;
-	}
+    // 等待所有线程完成计算
+    for (int i = 0; i < __nt; i++){
+        if (chunks[i] > 0)
+			// 如果当前线程分配了任务，则等待其完成
+            threads[i].join();
+    }
+    
+    // 将计算结果从临时空间复制到输出数组
+    for (int i = 0; i < s1; i++) {
+        for (int j = 0; j < s2; j++) {
+            outArr[i][j].s[0] = out_s[i][j];
+            outArr[i][j].z[0] = out_z[i][j];
+            outArr[i][j].m[0] = out_m[i][j];
+            outArr[i][j].e[0] = out_e[i][j];
+        }
+    }
 
-	delete[] row_s ; delete[] out_s ;
-	delete[] row_z ; delete[] out_z ;
-	delete[] row_m ; delete[] out_m ;
-	delete[] row_e ; delete[] out_e ;
+    // 释放临时内存空间
+    for (int i = 0; i < s1; i++) {
+        delete[] row_s[i]; delete[] out_s[i];
+        delete[] row_z[i]; delete[] out_z[i];
+        delete[] row_m[i]; delete[] out_m[i];
+        delete[] row_e[i]; delete[] out_e[i];
+    }
+
+    delete[] row_s; delete[] out_s;
+    delete[] row_z; delete[] out_z;
+    delete[] row_m; delete[] out_m;
+    delete[] row_e; delete[] out_e;
 }
 
 void dotProduct_thread(
@@ -547,7 +575,7 @@ void getLoss(int32_t s, vector<FPArray>& arr, vector<FPArray>& outArr) {
 	sum.push_back(__fp_op->input(__party, s, in_s, in_z, in_m, in_e, m_bits, e_bits)) ;
 	
 	FPArray res = __fp_op->vector_sum(sum) ;
-	FPArray div = __fp_op->input<float>(ALICE, 1, (float)(1.0/s), m_bits, e_bits) ;
+	FPArray div = __fp_op->input<float>(ALICE, 1, (float) 1.0/s, m_bits, e_bits) ;
 	res = __fp_op->mul(res, div) ;
 
 	outArr[0].s[0] = res.s[0] ;

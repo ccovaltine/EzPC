@@ -1437,7 +1437,9 @@ vector < FPArray > layer4bMom = make_vector_float(ALICE, 10) ;
 
 int32_t iters = 1 ;
 
-for (uint32_t i = 0; i < 1; i++){
+cout << "Begin Computing..." << endl;
+
+for (uint32_t i = 0; i < iters; i++){
 vector < vector < vector < vector < FPArray > > > > layer1In = make_vector_float(ALICE, 4, 32, 32, 3) ;
 
 vector < vector < vector < vector < BoolArray > > > > layer1Hot = make_vector_bool(ALICE, 4, 30, 30, 64) ;

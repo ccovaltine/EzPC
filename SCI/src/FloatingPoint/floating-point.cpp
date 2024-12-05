@@ -1394,9 +1394,9 @@ vector<FixArray> quotient_mantissa(FixOp *fix, const vector<FixArray> &m1, const
 }
 
 
-FixArray lyc_float_to_fix(FixOp *fix, float value){
-  const int bit_length = 27;
-  const int scale = 23;
+FixArray lyc_float_to_fix(FixOp *fix, float value, int _bit_length, int _scale){
+  const int bit_length = _bit_length;
+  const int scale = _scale;
   const int scale_factor = 1 << scale;
 
   bool sign = false;
@@ -1405,7 +1405,7 @@ FixArray lyc_float_to_fix(FixOp *fix, float value){
     value *= -1;
   }
   uint64_t fixed_value = static_cast<uint64_t>(value * scale_factor);
-  FixArray res = fix->input(ALICE, 1, fixed_value, sign, bit_length, scale);
+  FixArray res = fix->input(BOB, 1, fixed_value, sign, bit_length, scale);
   return res;
 }
 
@@ -1463,7 +1463,7 @@ vector<FixArray> lyc_quotient_mantissa(FixOp *fix, const vector<FixArray> &m1, c
   // 5. 把 q 转换为 m1 的格式 (q_flat_native -> q_flat -> q)
   vector<FixArray> q_flat(q_flat_native.size());
   for(int i=0; i<q_flat_native.size(); i++){
-    q_flat[i] = lyc_float_to_fix(fix, q_flat_native[i]);
+    q_flat[i] = lyc_float_to_fix(fix, q_flat_native[i], m_bits+1, m2.s);
   }
 
   FixArray q_flat_in_one = concat(q_flat);
@@ -1528,10 +1528,10 @@ vector<FPArray> FPOp::div(const vector<FPArray> &x, const FPArray &y, bool cheap
   }
 
   // lyc:
-  // vector<FixArray> q = lyc_quotient_mantissa(fix, x_m, y_m);
+  vector<FixArray> q = lyc_quotient_mantissa(fix, x_m, y_m);
 
   // original:
-  vector<FixArray> q = quotient_mantissa(fix, x_m, y_m, cheap_variant);
+  // vector<FixArray> q = quotient_mantissa(fix, x_m, y_m, cheap_variant);
 
   FixArray q_flat = concat(q);
 

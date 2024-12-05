@@ -947,18 +947,32 @@ FPArray FPMath::tanh_fp32(const FPArray &x) {
   return fp_op->sub(sig, one_flat) ;
 }
 
+/**
+ * 实现softmax函数的变体，用于处理浮点数数组
+ * 该函数接收一个浮点数数组的向量，并返回一个经过softmax处理的浮点数数组的向量
+ * 
+ * @param x 输入的浮点数数组向量，每个数组包含了一组浮点数
+ * @return 返回经过softmax处理的浮点数数组向量
+ */
 vector<FPArray> FPMath::softmax_beacon(const vector<FPArray>& x) {
+  // 获取输入向量的大小
   int N = x.size();
+  // 获取第一个浮点数数组的元素个数、尾数位数、指数位数
   int n = x[0].size;
   int m_bits = x[0].m_bits;
   int e_bits = x[0].e_bits;
+  // 确保尾数位数大于0
   assert(m_bits > 0);
+  
+  // 验证所有输入数组的合法性
   for(int i = 1; i < N; i++) {
     assert(x[i].party != PUBLIC);
     assert(x[i].m_bits == m_bits);
     assert(x[i].e_bits == e_bits);
     assert(x[i].size == n);
   }
+  
+  // 如果输入数组是bfloat16格式，则转换为FP32格式进行处理
   if (x[0].m_bits == BFLOAT16_M_BITS && x[0].e_bits == BFLOAT16_E_BITS) {
     vector<FPArray> y(x.size());
     for (int i = 0; i < x.size(); i++) {
@@ -972,7 +986,10 @@ vector<FPArray> FPMath::softmax_beacon(const vector<FPArray>& x) {
     }
     return y;
   }
+  
+  // 计算每组浮点数中的最大值
   FPArray x_max = fp_op->max(x);
+  // 创建一个平面数组来存储所有最大值
   FPArray x_max_flat(party, N*n, m_bits, e_bits);
   for (int i = 0; i < N; i++) {
     for (int j = 0; j < n; j++) {
@@ -982,10 +999,14 @@ vector<FPArray> FPMath::softmax_beacon(const vector<FPArray>& x) {
       x_max_flat.e[i*n + j] = x_max.e[i];
     }
   }
+  
+  // 将所有输入数组连接成一个平面数组
   FPArray x_flat = concat(x);
+  // 计算移位后的数组，用于后续的指数计算
   FPArray shifted_x_flat = fp_op->flip_sign(fp_op->sub(x_max_flat, x_flat, false, true, true));
   FPArray e_x_flat = this->exp(shifted_x_flat);
-
+  
+  // 将计算结果分割成与输入相同的数组形式
   vector<FPArray> e_x(N);
   for (int i = 0; i < N; i++) {
     e_x[i] = FPArray(party, n, m_bits, e_bits);
@@ -994,6 +1015,8 @@ vector<FPArray> FPMath::softmax_beacon(const vector<FPArray>& x) {
     memcpy(e_x[i].m, e_x_flat.m + i*n, n*sizeof(uint64_t));
     memcpy(e_x[i].e, e_x_flat.e + i*n, n*sizeof(uint64_t));
   }
+  
+  // 将数组进行转置，以便后续计算
   vector<FPArray> e_x_tr(n);
   for (int i = 0; i < n; i++) {
     e_x_tr[i] = FPArray(party, N, m_bits, e_bits);
@@ -1004,8 +1027,28 @@ vector<FPArray> FPMath::softmax_beacon(const vector<FPArray>& x) {
       e_x_tr[i].e[j] = e_x[j].e[i];
     }
   }
+  
+  // 计算每列的指数之和
   FPArray sum_e_x = fp_op->vector_sum(e_x);
+  // 计算转置后的softmax结果
+  
+  // cout << "e_x_tr.size() = " << e_x_tr.size() << endl;
+  // cout << "\te_x_tr[0].size = " << e_x_tr[0].size << endl;
+  // cout << "\t\te_x_tr[0].m_bits = " << (int)e_x_tr[0].m_bits << endl;
+  // cout << "\t\te_x_tr[0].e_bits = " << (int)e_x_tr[0].e_bits << endl;
+  // cout << "\tsum_e_x.size = " << sum_e_x.size << endl;
+  // cout << "\t\tsum_e_x.m_bits = " << (int)sum_e_x.m_bits << endl;
+  // cout << "\t\tsum_e_x.e_bits = " << (int)sum_e_x.e_bits << endl;
+
   vector<FPArray> ret_tr = fp_op->div(e_x_tr, sum_e_x, false);
+
+  // cout << "ret_tr.size() = " << ret_tr.size() << endl;
+  // cout << "\tret_tr[0].size = " << ret_tr[0].size << endl;
+  // cout << "\t\tret_tr[0].m_bits = " << (int)ret_tr[0].m_bits << endl;
+  // cout << "\t\tret_tr[0].e_bits = " << (int)ret_tr[0].e_bits << endl;
+
+  
+  // 将结果重新转置回原始顺序
   vector<FPArray> ret(N);
   for (int i = 0; i < N; i++) {
     ret[i] = FPArray(party, n, m_bits, e_bits);
@@ -1016,6 +1059,8 @@ vector<FPArray> FPMath::softmax_beacon(const vector<FPArray>& x) {
       ret[i].e[j] = ret_tr[j].e[i];
     }
   }
+  
+  // 返回最终的softmax结果
   return ret;
 }
 
