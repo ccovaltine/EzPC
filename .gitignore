@@ -1,5 +1,16 @@
 # Build Directory
-# build/
+build/bin/
+build/CMakeFiles
+build/include/
+build/lib/
+build/networks/
+build/src
+build/tests/
+build/cmake*
+build/CMake*
+build/Makefile
+
+# CMake
 bin/
 mpc_venv
 # Vim c_tags files
