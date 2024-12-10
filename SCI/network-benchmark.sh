@@ -14,12 +14,12 @@ network_name=$4
 if [ $role == 1 ]
 then
     echo "alice"
-   ./bin/$4*_$3* r=1 < ../networks/inputs/$4*_wei*.inp
+   ./build/bin/$4*_$3* r=1 < ../networks/inputs/$4*_wei*.inp
 elif [ $1 == "local" ]
 then
     echo "bob: local"
-    ./bin/$4*_$3* r=2 < ../networks/inputs/$4*_inp*.inp
+    ./build/bin/$4*_$3* r=2 < ../networks/inputs/$4*_inp*.inp
 else
     echo "bob: remote"
-    ./bin/$4*_$3* r=2 add=172.21.153.100 < ../networks/inputs/$4*_inp*.inp
+    ./build/bin/$4*_$3* r=2 add=172.21.153.100 < ../networks/inputs/$4*_inp*.inp
 fi
