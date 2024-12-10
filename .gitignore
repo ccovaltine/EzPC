@@ -1,14 +1,5 @@
 # Build Directory
-build/bin/
-build/CMakeFiles
-build/include/
-build/lib/
-build/networks/
-build/src
-build/tests/
-build/cmake*
-build/CMake*
-build/Makefile
+build/
 
 # CMake
 bin/
